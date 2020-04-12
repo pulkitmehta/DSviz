@@ -1,26 +1,24 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Pulkit's Initial Project</title>
+	<title>Graph Visualiser</title>
 	<meta content="width=device-width, initial-scale=1" name="viewport">
-	<meta content="Webflow" name="generator">
 	<link href="style.css" rel="stylesheet" type="text/css">
-	<link href="https://uploads-ssl.webflow.com/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
-	<link href="https://uploads-ssl.webflow.com/img/webclip.png" rel="apple-touch-icon">
+	
 </head>
 <body class="body">
 	<div class="body-container w-container"></div>
 	<div>
-		<h1 class="heading-2">Graph Visualizer</h1>
+		<h1 class="heading-2">Graph Visualiser</h1>
 	</div>
 	<div class="columns w-row">
 		<div class="column-2 w-col w-col-7">
 			<div class="section-2"><div class="w-form">
-				<form id="email-form" name="email-form" data-name="Email Form" class="form">
+				<form id="email-form" name="email-form" data-name="Email Form" class="form", action="generate">
 					<h6>Create a Graph:</h6>
 					<input type="text" class="w-input" maxlength="256" name="title" data-name="title" placeholder="Specify Title of graph" id="title">
 					<label>Choose graph type:</label>
-					<select id="field" name="field" required="" class="w-select">
+					<select id="field" name="type" required="" class="w-select">
 						<option value="0">Undirected</option>
 						<option value="1">Directed</option>
 					</select>
