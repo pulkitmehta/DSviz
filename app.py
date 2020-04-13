@@ -1,10 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as dsvis
 import joblib
 import os
-from flask import Flask, render_template, request
+import sys
+from flask import Flask, render_template, request, url_for
 import webbrowser
 from threading import Timer
+from time import time
 class Graph:
     
     def __init__(self, title="Graph"):
@@ -22,15 +24,16 @@ class Graph:
             
     def graphViz(self, seed=0, scale=(1,10), size=5,d=0.1,arr_size=0.01, direc=0, alpha=0.6):
         graph=self.graph
-        plt.figure(figsize=(size,size))
-        plt.title("DS plot by Pulkit Mehta\n\n"+self.name)
+        dsvis.figure(figsize=(size,size))
+        dsvis.box(on=None)
+        dsvis.title("DSvis Plot\n\n"+self.name)
         np.random.seed(seed)
         drawn=dict() 
         for key in graph.keys():
             x=np.random.randint(scale[0],scale[1])
             y=np.random.randint(scale[0],scale[1])
-            plt.plot(x,y,'o')
-            plt.text(x+d,y+d,  key)
+            dsvis.plot(x,y,'o')
+            dsvis.text(x+d,y+d,  key)
             if key not in drawn.keys():
                 drawn[key]=[x,y]
             else:
@@ -42,8 +45,8 @@ class Graph:
                 if val not in drawn.keys():
                     x=np.random.randint(scale[0],scale[1])
                     y=np.random.randint(scale[0],scale[1])
-                    plt.plot(x,y,'o')
-                    plt.text(x+d,y+d,  val)
+                    dsvis.plot(x,y,'o')
+                    dsvis.text(x+d,y+d,  val)
                     drawn[val]=[x,y]
                 else:
                     pass
@@ -59,27 +62,40 @@ class Graph:
                 
                 
                 if direc==0:
-                    plt.plot([x1,x2],[y1,y2], alpha=alpha)
+                    dsvis.plot([x1,x2],[y1,y2], alpha=alpha)
                 else:
-                    plt.arrow(x1,y1,-x1+x2,-y1+y2,length_includes_head=True, head_width=arr_size, alpha=alpha)
+                    dsvis.arrow(x1,y1,-x1+x2,-y1+y2,length_includes_head=True, head_width=arr_size, alpha=alpha)
                     
                 ## plotting weights
                 wt=sorted(j.values())[0]
                 mx=(x1+x2)/2
                 my=(y1+y2)/2
                 
-                plt.plot(mx,my)
-                plt.text(mx+d,my+d,wt)
+                dsvis.plot(mx,my)
+                dsvis.text(mx+d,my+d,wt)
                 
                 
-        plt.xticks(())
-        plt.yticks(())
-        plt.xlabel("ORIENTATION= "+str(seed)+"  | "+
+        dsvis.xticks(())
+        dsvis.yticks(())
+        dsvis.xlabel("ORIENTATION= "+str(seed)+"  | "+
                    " SPACE: "+str(scale[1])+ 
                    "  |  SIZE: "+str(size)+
-                   "  |  d= "+str(d))
-        plt.savefig("grph.png", transparent=True, dpi=300)
-        plt.close()
+                   "  |  d= "+str(d)+
+                   "  |  ALPHA="+str(alpha))
+
+
+
+        fname=str(time())+".png"
+        imgpath=os.path.join("static",fname)
+
+        try:
+            os.remove(os.path.join("static","*.png"))
+        except:
+            pass
+        dsvis.savefig(imgpath, transparent=True, dpi=300)
+        dsvis.close()
+
+        return fname
 
 
 
@@ -102,23 +118,101 @@ def open_browser():
 def gen():
     gn=request.form.get('title')
 
-    direc=request.form.get('type')
+    direc=int(request.form.get('type'))
 
     structure=request.form.get('structure')
     
-    direc=request.form.get('type')
-    direc=request.form.get('type')
-    direc=request.form.get('type')
-    direc=request.form.get('type')
-    direc=request.form.get('type')
+    file_name=request.form.get('fileselect')
 
-    img_name=request.form.get('images')
-    path=os.path.join("input",img_name)
-    print(path)
-    pred=predictit(path)
-    print(pred)
-    images=os.listdir("input")
-    return render_template('home.html',pname=pn ,imgs=images,covid_text=str(pred[2]) ,show_img=img_name, pneumonia_text=str(pred[1]),  normal_text=str(pred[0]))
+    to_save=request.form.get('to_save')
+
+
+
+    if structure!="":
+        g=Graph(gn)
+        print("Created empty graph",g.name)
+        edge=[]
+        for ch in structure:
+            if ch=="(":
+                edge=[]
+                v=str()
+            elif ch==',':
+                if v!="":
+                    edge.append(v)
+                v=str()
+                
+            elif ch==')':
+                edge.append(v)
+                print("Added Edge: ",edge)
+                g.addEdge(edge[0],edge[1],edge[2])
+                v=str()
+            else:
+                v=v+ch
+
+
+
+
+        if to_save=="1":
+            joblib.dump(g,os.path.join("saved_graphs",gn+".dsvisGraph"))
+
+
+
+
+
+
+
+
+    else:
+        path=os.path.join("saved_graphs",file_name) 
+        print(path)
+        g=joblib.load(path)
+
+    
+    try:
+        seed=int(request.form.get('seed'))
+    except:
+        seed=0
+    try:
+        space=int(request.form.get('space'))
+    except:
+        space=10
+
+    try:
+        size=int(request.form.get('size'))
+    except:
+        size=5
+
+    try:
+        d=float(request.form.get('d'))
+    except:
+        d=0.1
+
+    try:
+        arr_size=float(request.form.get('arrowhead'))
+    except:
+        arr_size=0.01
+
+    try:
+        alpha=float(request.form.get('alpha'))
+    except:
+        alpha=0.6
+
+    try:
+        fname=g.graphViz(seed=seed,
+         scale=(1,space), size=size,d=d,
+            arr_size=arr_size, direc=direc, alpha=alpha)
+        shout=str(time())+" |Shout: No errors!"
+    except:
+        shout=str(time())+" |Shout Check your values!"
+    
+
+    memory=sys.getsizeof(g)
+    _id=id(g)
+    graphs=os.listdir("saved_graphs")
+
+    return render_template('home.html',files=graphs,
+     img=url_for('static',filename=fname),g=g.graph,
+     shout=shout,memory=memory,id=hex(_id))
 
 
 

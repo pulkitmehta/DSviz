@@ -3,66 +3,92 @@
 	<meta charset="utf-8">
 	<title>Graph Visualiser</title>
 	<meta content="width=device-width, initial-scale=1" name="viewport">
-	<link href="style.css" rel="stylesheet" type="text/css">
+	<link href="{{url_for('static',filename='style.css')}}" rel="stylesheet" type="text/css">
 	
 </head>
 <body class="body">
 	<div class="body-container w-container"></div>
 	<div>
-		<h1 class="heading-2">Graph Visualiser</h1>
+		<h1 class="heading-2">DSvis Graph Visualiser</h1>
+		<center>
+			<h6>A project by Pulkit Mehta</h6>
+			<a href="https://github.com/pulkitmehta/DSviz">Github</a>
+		</center>
 	</div>
 	<div class="columns w-row">
 		<div class="column-2 w-col w-col-7">
 			<div class="section-2"><div class="w-form">
-				<form id="email-form" name="email-form" data-name="Email Form" class="form", action="generate">
+				<form id="email-form" name="email-form" data-name="Email Form" class="form", action="generate", method="post">
 					<h6>Create a Graph:</h6>
 					<input type="text" class="w-input" maxlength="256" name="title" data-name="title" placeholder="Specify Title of graph" id="title">
-					<label>Choose graph type:</label>
+					
+					<label for="structure">Define Graph structure (Nodes along with weights, 0 for unweighted):</label>
+					<textarea maxlength="5000" id="structure" name="structure" data-name="structure" placeholder="(a,b,w1)(c,d,w2)(a,c,w3)(d,a,w4)" class="w-input"></textarea>
+
+					<label>Do you want to save it?</label>
+					<select id="field" name="to_save" required="" class="w-select">
+						<option value="0">No</option>
+						<option value="1">Yes</option>
+					</select>
+
+					<h5>OR</h5>
+					<h6> Load Graph:</h6>
+					<label>Choose graph file present in saved directory:</label>
+					<select id="fileselect" name="fileselect" data-name="fileselect" class="w-select">
+						{% for file in files %}
+			              <option value= "{{file}}">{{file}}</option>"
+			            {% endfor %}
+					</select>
+					<div>
+						<h5>Formatting </h5>
+						<label>Choose graph type:</label>
 					<select id="field" name="type" required="" class="w-select">
 						<option value="0">Undirected</option>
 						<option value="1">Directed</option>
 					</select>
-					<label for="structure">Define Graph structure (Nodes along with weights, 0 for unweighted):</label>
-					<textarea required="" maxlength="5000" id="structure" name="structure" data-name="structure" placeholder="(a,b,w1),(c,d,w2),(a,c,w3),(d,a,w4)" class="w-input"></textarea>
-					<h5>OR</h5>
-					<h6> Load Graph:</h6>
-					<label>Choose graph file present in saved directory:</label>
-					<select id="fileselect" name="fileselect" data-name="fileselect" required="" class="w-select">
-						<option value="">Select one...</option>
-						<option value="First">First Choice</option>
-						<option value="Second">Second Choice</option>
-						<option value="Third">Third Choice</option>
-					</select>
-					<div>
-						<label for="seed">Formatting:</label>
+					<label>(Optional):</label>
 						<input type="number" class="w-input" maxlength="256" name="seed" data-name="seed" placeholder="Orientation (Specify random integer for different graph orientations)" id="seed">
+
+						<input type="number" class="w-input" maxlength="256" name="space" data-name="space" placeholder="Integer value to reduce overlapping and co-linear vertices" id="space">
+
+						<input type="number" class="w-input" maxlength="256" name="size" data-name="size" placeholder="Specify size of image (integer value)" id="size">
+
+						<input type="text" class="w-input" maxlength="256" name="d" data-name="d" placeholder="Specify label offset" id="d">
+
+						<input type="text" class="w-input" maxlength="256" name="arrowhead" data-name="arrowhead" placeholder="Specify arrow head size (for directed graph)" id="arrowhead">
+
+						<input type="text" class="w-input" maxlength="256" name="alpha" data-name="alpha" placeholder="Transparency (0 to 1)" id="arrowhead">
+
+						<input type="submit" value="Generate" data-wait="Please wait..." class="w-button">
 					</div>
-					<input type="number" class="w-input" maxlength="256" name="space" data-name="space" placeholder="Integer value to reduce overlapping and co-linear vertices" id="space">
-					<input type="number" class="w-input" maxlength="256" name="size" data-name="size" placeholder="Specify size of image (integer value)" id="size">
-					<input type="number" class="w-input" maxlength="256" name="d" data-name="d" placeholder="Specify label offset" id="d">
-					<input type="number" class="w-input" maxlength="256" name="arrowhead" data-name="arrowhead" placeholder="Specify arrow head size (for directed graph)" id="arrowhead">
-					<input type="submit" value="Generate" data-wait="Please wait..." class="w-button">
+					
 				</form>
 					<div class="w-form-done">
-						<div>Thank you! Your submission has been received!</div>
+						<div>Done!</div>
 					</div>
 					<div class="w-form-fail">
-						<div>Oops! Something went wrong while submitting the form.</div>
+						<div>Oops! Check values.</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="column w-col w-col-5">
 			<div>
-				<img src="grph.png" width="456" alt="ALTTEXT">
+				<img src="http://127.0.0.1:5000{{img}}" width="456" alt="OUTPUT">
 			</div>
 			<div>
-				<p>Object Infoa<br/>sasasa<br/>s<br/>ds<br/>sd<br/>d</p>
-				<a href="#" class="w-button">Save graph</a>
+				<h6>Graph Info:</h6>
+				<p>{{g}}</p>
+				<h6>Memory Occupied:</h6>
+				<p>{{memory}} Bytes</p>
+				<h6>Address:</h6>
+				<p>{{id}}</p>
+				<h6>Error Shouts:</h6>
+				<p>Time: {{shout}}</p>
 			</div>
 		</div>
 	</div>
-				
+			
 			
 </body>
 </html>

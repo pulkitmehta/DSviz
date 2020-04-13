@@ -1,0 +1,3 @@
+(wakeup,freshup,2)(freshup,eat,2)(eat,travel,2)(travel,work,2)(work,eat,2)(eat,work,2)(work,travel,2)(travel,rest,2)(rest,sleep,2)(sleep,wakeup,2)
+
+(wakeup,freshup,2)(freshup,eat,2)(eat,work,2)(work,rest,2)(rest,sleep,2)(sleep,wakeup,2)
